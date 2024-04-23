@@ -8,8 +8,21 @@
   Система состоит из 3 основных компонентов: клиенсткого приложения с графическим интерфейсом, предсказательной модели и управляющего сервера с встроенной базой данных. Модель обучается отдельно от остальных модулей решения, тем не менее в дальнейшем будет предусмотрена возможность настройки внутренних параметров модели со стороны клиента. Графическое приложение и модель обмениваются данным с сервером при помощи протокола HTTP, отправляя полезные данные в формате JSON. Сервер, в свою очередь, преобразует приходящие запросы в запросы к базе данных SQLite и перенаправляет потоки данных между модулями.
 
   ## Программное обеспечение
-  
-
+  Далее представлена программная реализациия модели обработки и прогнозирования данных на языке Python.
+  В проекте были использованы следующие библиотеки:
+  ```python
+   import pandas as pd
+   import numpy as np
+   import matplotlib.pyplot as plt
+   from sklearn.model_selection import train_test_split
+   from catboost import CatBoostRegressor
+   from lightgbm import LGBMRegressor
+   import xgboost as xgb
+   from sklearn.model_selection import TimeSeriesSplit
+   from sklearn.model_selection import cross_val_score
+   from sklearn.model_selection import GridSearchCV
+   from sklearn.metrics import mean_squared_error
+  ```
 
    
 
