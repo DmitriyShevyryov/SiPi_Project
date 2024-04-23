@@ -23,6 +23,51 @@
    from sklearn.model_selection import GridSearchCV
    from sklearn.metrics import mean_squared_error
   ```
-
-   
+  Затем выполняются импортирование данных, сортировка и проверка индексов на монотонность:
+  ```python
+   # Uploading data
+   data = pd.read_csv('/kaggle/input/daily-climate-time-series- 
+   data/DailyDelhiClimateTrain.csv', index_col = [0],  parse_dates = [0])
+   # Sorting indexes
+   data.sort_index(ascending = True)
+   # Checking whether indexes monotonic or not
+   print(data.index.is_monotonic_increasing)
+  ```
+  Далее происходит подготовка датасета для определения скользящего среднего:
+  ```python
+  data_shift = data - data.shift()
+  data_shift['mean'] = data_shift['temperature'].rolling(15).mean()
+  data_shift['std'] = data_shift['temperature'].rolling(15).std()
+  fig, ax = plt.subplots(figsize = (12, 9))
+  ax.plot(data_shift['mean'])
+  ax.plot(data_shift['std'])
+  ax.plot(data_shift['temperature'])
+  ax.legend(['mean', 'std', 'temp'])
+  ax.set_xlabel('Date')
+  ax.set_ylabel('Temp')
+  ax.set_title("Temp by period");
+  ```
+  На данном этапе разработки самой высокой точности предсказания добился алгоритм CatBoost, поэтому именно он будет использован в текущей реализации. Кроме того, здесь выводятся параметры градиентного бустинга, при которых модель наиболее точна:
+  ```python
+ tscv = TimeSeriesSplit(n_splits=5).split(features_train)
+ CB_model = CatBoostRegressor()
+ cat_params = {
+    'depth' : [2, 4, 6],
+    'n_estimators' : [100, 250]
+               }
+  cat_GS = GridSearchCV(CB_model, 
+                       cat_params, 
+                       scoring = 'neg_root_mean_squared_error', 
+                       cv = tscv)
+  cat_GS.fit(features_train, target_train, verbose=100)
+  %%time
+  cat_best_params = cat_GS.best_params_
+  predict_cat = cat_GS.predict(features_valid)
+  cat_score = cat_GS.best_score_ * -1
+  print(cat_best_params)
+  print(cat_score)
+  ```
+  ## Обзор пользовательского интерфейса
+  Первоначально пользователю необходимо аутентифицироваться и авторизоваться в системе. Требуется ввести Логин и Пароль после чего пользователь получит доступ к основному функционалу приложения.
+  
 
